@@ -1,0 +1,6 @@
+{
+  "name": "CivicFlow AI",
+  "description": "Agentic Urban Problem Resolution & Coordination Platform by Team MoveSmart for Smart Cities and Public Services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
