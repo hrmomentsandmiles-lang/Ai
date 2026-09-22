@@ -9,6 +9,8 @@ export const LoginForm: React.FC = () => {
     setRole,
     phone,
     setPhone,
+    userName,
+    setUserName,
     step,
     setStep,
     otp,
@@ -114,6 +116,24 @@ export const LoginForm: React.FC = () => {
               onSelectRole={setRole}
               disabled={isLoading}
             />
+
+            <div>
+              <label
+                htmlFor="loginform-username-input"
+                className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2"
+              >
+                Username / Full Name
+              </label>
+              <input
+                id="loginform-username-input"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="Enter your username (e.g. Aarav Sharma)"
+                disabled={isLoading}
+                className="w-full px-4 py-2.5 text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent text-slate-900 placeholder:text-slate-400 transition-all"
+              />
+            </div>
 
             <div>
               <label

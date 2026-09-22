@@ -15,6 +15,7 @@ export interface AuthState {
   session: UserSession | null;
   role: UserRole;
   phone: string;
+  userName: string;
   step: AuthStep;
   otp: string;
   generatedMockOtp: string;

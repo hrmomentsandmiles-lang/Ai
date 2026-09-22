@@ -13,6 +13,8 @@ export const CivicFlowLoginCard: React.FC<CivicFlowLoginCardProps> = ({ classNam
     setRole,
     phone,
     setPhone,
+    userName,
+    setUserName,
     step,
     setStep,
     otp,
@@ -110,18 +112,46 @@ export const CivicFlowLoginCard: React.FC<CivicFlowLoginCardProps> = ({ classNam
       </div>
 
       {step === 'input' ? (
-        /* STEP 1: Phone Input */
+        /* STEP 1: Username and Phone Input */
         <form onSubmit={handleSendOtp} className="space-y-4">
           <div className="text-center pb-1">
             <h3 className="text-base font-bold text-[#182315]">
               {isSignUpMode ? 'Register on CivicFlow' : 'Login with OTP'}
             </h3>
             <p className="text-xs text-[#6F7E68] mt-0.5">
-              Enter your mobile number to continue
+              Enter your username and mobile number to continue
             </p>
           </div>
 
+          {/* Username Input */}
           <div>
+            <label
+              htmlFor="username-input"
+              className="text-xs font-semibold text-[#182315] block mb-1.5"
+            >
+              Username / Full Name
+            </label>
+            <div className="flex items-center rounded-xl border border-[#D4DCC9] bg-[#FDFCFB] overflow-hidden focus-within:ring-2 focus-within:ring-[#4D602B] focus-within:border-transparent transition-all px-3 py-2.5">
+              <User className="w-4 h-4 text-[#6A7B63] mr-2 shrink-0" />
+              <input
+                id="username-input"
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="Enter your username (e.g. Aarav Sharma)"
+                className="w-full text-sm text-[#182315] bg-transparent focus:outline-none placeholder:text-[#9AA695]"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Number Input */}
+          <div>
+            <label
+              htmlFor="phone-number-input"
+              className="text-xs font-semibold text-[#182315] block mb-1.5"
+            >
+              Mobile Number
+            </label>
             <div className="flex rounded-xl border border-[#D4DCC9] bg-[#FDFCFB] overflow-hidden focus-within:ring-2 focus-within:ring-[#4D602B] focus-within:border-transparent transition-all">
               <span className="inline-flex items-center px-3.5 bg-[#F2F5ED] text-[#4A5943] text-sm font-semibold border-r border-[#D4DCC9]">
                 +91
@@ -131,7 +161,7 @@ export const CivicFlowLoginCard: React.FC<CivicFlowLoginCardProps> = ({ classNam
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your mobile number"
+                placeholder="Enter your 10-digit mobile number"
                 className="w-full px-3.5 py-2.5 text-sm text-[#182315] bg-transparent focus:outline-none placeholder:text-[#9AA695]"
               />
             </div>
@@ -207,7 +237,7 @@ export const CivicFlowLoginCard: React.FC<CivicFlowLoginCardProps> = ({ classNam
             </div>
             <h3 className="text-base font-bold text-[#182315]">Enter Verification Code</h3>
             <p className="text-xs text-[#6F7E68] mt-0.5">
-              Enter the 6-digit code sent to <span className="font-semibold text-[#182315]">+91 {phone}</span>
+              Welcome <span className="font-semibold text-[#182315]">{userName || 'Resident'}</span>, enter the 6-digit code sent to <span className="font-semibold text-[#182315]">+91 {phone}</span>
             </p>
           </div>
 

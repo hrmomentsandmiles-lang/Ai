@@ -7,6 +7,8 @@ interface AuthContextType {
   setRole: (role: UserRole) => void;
   phone: string;
   setPhone: (phone: string) => void;
+  userName: string;
+  setUserName: (userName: string) => void;
   step: AuthStep;
   setStep: (step: AuthStep) => void;
   otp: string;
@@ -31,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { navigate } = useRouter();
   const [role, setRole] = useState<UserRole>('citizen');
   const [phone, setPhone] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
   const [step, setStep] = useState<AuthStep>('input');
   const [otp, setOtp] = useState<string>('');
   const [generatedMockOtp, setGeneratedMockOtp] = useState<string>('842109');
@@ -53,6 +56,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sendMockOtp = async (): Promise<boolean> => {
     setError(null);
+    if (!userName.trim()) {
+      setError('Please enter your username / full name.');
+      return false;
+    }
     const cleanedPhone = phone.replace(/\D/g, '');
     if (cleanedPhone.length < 10) {
       setError('Please enter a valid 10-digit mobile number.');
@@ -87,11 +94,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 350));
 
+    const finalDisplayName =
+      userName.trim() || (role === 'citizen' ? 'Aarav Sharma' : 'Municipal Field Officer');
+    const rawDigits = phone.replace(/\D/g, '');
+    const formattedPhone = rawDigits ? `+91 ${rawDigits.slice(-10)}` : '+91 98765 43210';
+
     const newSession: UserSession = {
-      phone: phone || '+91 98765 43210',
+      phone: formattedPhone,
       role,
       authenticatedAt: new Date().toISOString(),
-      displayName: role === 'citizen' ? 'Aarav Sharma' : 'Municipal Field Officer',
+      displayName: finalDisplayName,
       badgeId: role === 'officer' ? 'MUNI-FLD-882' : undefined,
       department: role === 'officer' ? 'Urban Works & Public Safety' : undefined,
     };
@@ -127,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserName = (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) return;
+    setUserName(trimmed);
     setSession((prev) => {
       if (!prev) return null;
       const updated: UserSession = { ...prev, displayName: trimmed };
@@ -142,13 +155,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetAuthFlow = () => {
     setStep('input');
     setOtp('');
+    setUserName('');
     setError(null);
     setIsLoading(false);
   };
 
   const usePresetDemo = (selectedRole: UserRole) => {
     setRole(selectedRole);
-    setPhone(selectedRole === 'citizen' ? '(555) 234-5678' : '(555) 876-5432');
+    setPhone(selectedRole === 'citizen' ? '9876543210' : '9876543211');
+    setUserName(selectedRole === 'citizen' ? 'Aarav Sharma' : 'Rajesh Kumar');
     setError(null);
   };
 
@@ -159,6 +174,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setRole,
         phone,
         setPhone,
+        userName,
+        setUserName,
         step,
         setStep,
         otp,
