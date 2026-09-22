@@ -5,34 +5,78 @@
 
 import React from 'react';
 import { RouterProvider, useRouter } from './context/RouterContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
-import { LandingPage } from './components/landing/LandingPage';
-import { CitizenShell } from './components/citizen/CitizenShell';
+import { HomePage } from './components/public/HomePage';
+import { AboutPage } from './components/public/AboutPage';
+import { SupportPage } from './components/public/SupportPage';
+import { ContactPage } from './components/public/ContactPage';
+import { LoginPage } from './components/public/LoginPage';
+import { CitizenDashboard } from './components/citizen/CitizenDashboard';
+import { ReportIssuePage } from './components/citizen/ReportIssuePage';
+import { MyReportsPage } from './components/citizen/MyReportsPage';
+import { ReportDetailsPage } from './components/citizen/ReportDetailsPage';
+import { CitizenProfilePage } from './components/citizen/CitizenProfilePage';
 import { OfficerShell } from './components/officer/OfficerShell';
 
 const AppContent: React.FC = () => {
   const { pathname } = useRouter();
+  const { session } = useAuth();
 
-  // Route matching
+  // Route matching with public pages and authenticated shells
   const renderRoute = () => {
+    // Protected Citizen Routes Check
+    if (pathname.startsWith('/citizen')) {
+      if (!session) {
+        return <LoginPage />;
+      }
+
+      if (pathname === '/citizen/report') {
+        return <ReportIssuePage />;
+      }
+      if (pathname === '/citizen/reports') {
+        return <MyReportsPage />;
+      }
+      if (pathname.startsWith('/citizen/reports/')) {
+        const reportId = pathname.replace('/citizen/reports/', '').split('/')[0];
+        return <ReportDetailsPage reportId={reportId} />;
+      }
+      if (pathname === '/citizen/profile') {
+        return <CitizenProfilePage />;
+      }
+      // Default citizen path: /citizen or /citizen/dashboard
+      return <CitizenDashboard />;
+    }
+
+    // Protected Officer Route
+    if (pathname.startsWith('/officer')) {
+      if (!session) {
+        return <LoginPage />;
+      }
+      return <OfficerShell />;
+    }
+
+    // Public Routes
     switch (pathname) {
-      case '/citizen':
-        return <CitizenShell />;
-      case '/officer':
-        return <OfficerShell />;
-      case '/':
+      case '/about':
+        return <AboutPage />;
+      case '/support':
+        return <SupportPage />;
+      case '/contact':
+        return <ContactPage />;
       case '/login':
+        return <LoginPage />;
+      case '/':
       default:
-        return <LandingPage />;
+        return <HomePage />;
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100/60 text-slate-900 selection:bg-slate-900 selection:text-white font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#182315] selection:bg-[#4D602B] selection:text-white font-sans antialiased">
       <Header />
-      <main className="flex-1 flex flex-col justify-center">
+      <main className="flex-1 flex flex-col">
         {renderRoute()}
       </main>
       <Footer />

@@ -13,9 +13,6 @@ export const LandingPage: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             CivicFlow AI
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-            Team MoveSmart
-          </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
             <Cpu className="w-3.5 h-3.5" />
             Agentic AI for Smart Cities

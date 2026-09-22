@@ -71,7 +71,7 @@ export const LoginForm: React.FC = () => {
               </span>
             </div>
             <p className="text-amber-800 text-xs leading-relaxed">
-              This system uses simulated one-time passwords for hackathon prototyping.
+              This system uses simulated one-time passwords for prototype evaluation.
               <strong> No government identity verification</strong> (national IDs, civic registries, or official credentials) is claimed or connected.
             </p>
           </div>

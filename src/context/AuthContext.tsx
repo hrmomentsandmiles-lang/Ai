@@ -20,6 +20,7 @@ interface AuthContextType {
   logout: () => void;
   usePresetDemo: (role: UserRole) => void;
   resetAuthFlow: () => void;
+  updateUserName: (name: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    if (otp.trim() !== generatedMockOtp && otp.trim() !== '123456') {
-      setError(`Invalid verification code. Enter mock code ${generatedMockOtp} or 123456.`);
+    if (otp.trim().length !== 6) {
+      setError('Please enter a valid 6-digit verification code.');
       return false;
     }
 
@@ -87,10 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await new Promise((resolve) => setTimeout(resolve, 350));
 
     const newSession: UserSession = {
-      phone: phone || '+1 (555) 019-2831',
+      phone: phone || '+91 98765 43210',
       role,
       authenticatedAt: new Date().toISOString(),
-      displayName: role === 'citizen' ? 'Verified Resident' : 'Municipal Field Officer',
+      displayName: role === 'citizen' ? 'Aarav Sharma' : 'Municipal Field Officer',
       badgeId: role === 'officer' ? 'MUNI-FLD-882' : undefined,
       department: role === 'officer' ? 'Urban Works & Public Safety' : undefined,
     };
@@ -121,6 +122,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sessionStorage.removeItem(STORAGE_KEY);
     resetAuthFlow();
     navigate('/');
+  };
+
+  const updateUserName = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setSession((prev) => {
+      if (!prev) return null;
+      const updated: UserSession = { ...prev, displayName: trimmed };
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // Ignore storage errors
+      }
+      return updated;
+    });
   };
 
   const resetAuthFlow = () => {
@@ -156,6 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         usePresetDemo,
         resetAuthFlow,
+        updateUserName,
       }}
     >
       {children}

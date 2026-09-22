@@ -1,15 +1,25 @@
-import React from 'react';
-import { UserCheck, Shield, LogOut, ArrowLeft, Layers, CheckCircle2, Phone, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, UserCheck, Shield, LogOut, ArrowLeft, Layers, CheckCircle2, Phone, Calendar } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from '../../context/RouterContext';
 
 export const CitizenShell: React.FC = () => {
-  const { session, logout } = useAuth();
+  const { session, logout, updateUserName } = useAuth();
   const { navigate } = useRouter();
+
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [nameInput, setNameInput] = useState<string>(session?.displayName || 'Aarav Sharma');
 
   const formattedDate = session?.authenticatedAt
     ? new Date(session.authenticatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'Active';
+
+  const handleSaveName = () => {
+    if (nameInput.trim()) {
+      updateUserName(nameInput.trim());
+      setIsEditingName(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6">
@@ -35,9 +45,12 @@ export const CitizenShell: React.FC = () => {
                 Citizen Session Authenticated
               </span>
             </div>
-            <h1 className="text-xl font-bold text-slate-900 mt-1">
-              Citizen Portal Shell
+            <h1 className="text-2xl font-bold text-slate-900 mt-1">
+              Login
             </h1>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Welcome, <span className="font-semibold text-slate-900">{session?.displayName || 'Aarav Sharma'}</span>
+            </p>
           </div>
         </div>
 
@@ -70,7 +83,49 @@ export const CitizenShell: React.FC = () => {
           Verified Resident Session Details
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* User Name Card */}
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-slate-500">User Name</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isEditingName) {
+                    setNameInput(session?.displayName || 'Aarav Sharma');
+                  }
+                  setIsEditingName(!isEditingName);
+                }}
+                className="text-[10px] text-[#4D602B] hover:underline font-semibold"
+              >
+                {isEditingName ? 'Cancel' : 'Edit'}
+              </button>
+            </div>
+            {isEditingName ? (
+              <div className="flex items-center gap-1.5 mt-1">
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  className="w-full text-xs px-2 py-1 bg-white border border-slate-300 rounded font-medium text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#4D602B]"
+                  placeholder="Enter name"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveName}
+                  className="px-2 py-1 text-[10px] bg-[#435322] hover:bg-[#36441B] text-white rounded font-medium"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 font-medium text-slate-900 text-sm">
+                <User className="w-4 h-4 text-[#4D602B]" />
+                <span className="truncate">{session?.displayName || 'Aarav Sharma'}</span>
+              </div>
+            )}
+          </div>
+
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-[11px] text-slate-500 block mb-1">Access Role</span>
             <div className="flex items-center gap-2 font-medium text-slate-900 text-sm">

@@ -1,52 +1,115 @@
 import React from 'react';
-import { AlertCircle, Terminal } from 'lucide-react';
+import { useRouter } from '../../context/RouterContext';
+import { CivicFlowLogo } from './CivicFlowLogo';
 
 export const Footer: React.FC = () => {
+  const { navigate } = useRouter();
+
   return (
-    <footer className="border-t border-slate-200 bg-slate-50 py-8 text-xs text-slate-600 mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div>
-            <h4 className="font-semibold text-slate-900 mb-1">CivicFlow AI</h4>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Agentic Urban Problem Resolution & Coordination Platform
+    <footer className="border-t border-[#E5EBDD] bg-[#FAF8F5] py-10 text-xs text-[#5C6C55] mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          {/* Brand Col */}
+          <div className="md:col-span-1 space-y-3">
+            <CivicFlowLogo size="sm" onClick={() => navigate('/')} />
+            <p className="text-xs text-[#6B7C64] leading-relaxed">
+              Agentic Urban Problem Resolution & Coordination Platform for smarter, cleaner, and safer cities.
             </p>
-            <p className="text-slate-400 italic text-[11px] mt-1.5">
-              “See a problem. Report it. Let AI coordinate the response.”
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-slate-900 mb-1">Hackathon Context</h4>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Team: <span className="font-medium text-slate-800">MoveSmart</span>
-            </p>
-            <p className="text-slate-500 text-xs leading-relaxed mt-0.5">
-              Theme: <span className="font-medium text-slate-800">Agentic AI for Smart Cities and Public Services</span>
+            <p className="text-[11px] font-script text-xl text-[#4D602B]">
+              People · Cities · Better Tomorrow
             </p>
           </div>
 
-          <div className="rounded-lg bg-amber-50/70 border border-amber-200/80 p-3">
-            <div className="flex items-start gap-2 text-amber-900">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-700" />
-              <div>
-                <span className="font-semibold text-amber-900 block text-xs">
-                  Prototype Disclaimer
-                </span>
-                <p className="text-amber-800 text-[11px] leading-tight mt-0.5">
-                  Mock authentication only. No government identity verification or national registry lookup is performed.
-                </p>
-              </div>
-            </div>
+          {/* Quick Links */}
+          <div className="space-y-2.5">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-[#182315]">
+              Platform
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="hover:text-[#182315] hover:underline"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigate('/about')}
+                  className="hover:text-[#182315] hover:underline"
+                >
+                  About CivicFlow
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigate('/support')}
+                  className="hover:text-[#182315] hover:underline"
+                >
+                  Support & FAQs
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigate('/contact')}
+                  className="hover:text-[#182315] hover:underline"
+                >
+                  Contact Us
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="hover:text-[#182315] hover:underline text-[#4D602B] font-medium"
+                >
+                  Citizen & Officer Login
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Civic Services */}
+          <div className="space-y-2.5">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-[#182315]">
+              Civic Services
+            </h4>
+            <ul className="space-y-2 text-xs text-[#5C6C55]">
+              <li>Roads & Pavements</li>
+              <li>Sanitation & Waste Management</li>
+              <li>Street Lighting & Electricity</li>
+              <li>Water Supply & Drainage</li>
+              <li>Urban Parks & Green Spaces</li>
+            </ul>
+          </div>
+
+          {/* Citizen Support */}
+          <div className="rounded-2xl bg-[#F3F7EE] border border-[#DEE7D4] p-5 space-y-2">
+            <h4 className="text-xs font-bold text-[#3C4D22] uppercase tracking-wider">
+              Citizen Helpline
+            </h4>
+            <p className="text-sm font-bold text-[#182315]">
+              1800 123 4567
+            </p>
+            <p className="text-[11px] text-[#63745C] leading-relaxed">
+              Toll-free municipal assistance available Monday to Saturday, 9:00 AM – 6:00 PM.
+            </p>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-slate-500 text-[11px]">
+        {/* Bottom bar */}
+        <div className="pt-6 border-t border-[#E5EBDD] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#71826A]">
           <div className="flex items-center gap-2">
-            <Terminal className="w-3.5 h-3.5 text-slate-400" />
-            <span>Architecture: Next/React Foundation • SQLite + Prisma Ready • Modular Agents Pipeline</span>
+            <span>People · Cities · Better Tomorrow</span>
           </div>
-          <span>Team MoveSmart © {new Date().getFullYear()}</span>
+          <div className="flex items-center gap-1">
+            <span>© {new Date().getFullYear()} CivicFlow AI. All rights reserved.</span>
+          </div>
         </div>
       </div>
     </footer>
