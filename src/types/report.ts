@@ -14,6 +14,37 @@ export type ReportStatus =
   | 'In Progress'
   | 'Resolved';
 
+export type IncidentState =
+  | 'PENDING'
+  | 'APPROVED'
+  | 'TEAM_ASSIGNED'
+  | 'TEAM_REACHED'
+  | 'WORK_STARTED'
+  | 'COMPLETED'
+  | 'REJECTED';
+
+export type ResponseTeamId =
+  | 'road-department'
+  | 'traffic'
+  | 'drainage'
+  | 'movesmart';
+
+export interface AssignedTeamInfo {
+  id: ResponseTeamId | string;
+  name: string;
+  assignedAt: string;
+  availability?: string;
+  leadOfficer?: string;
+}
+
+export interface MonitoringUpdate {
+  stage: IncidentState;
+  label: string;
+  timestamp: string;
+  note?: string;
+  completed?: boolean;
+}
+
 export interface ReportMedia {
   id: string;
   name: string;
@@ -36,9 +67,15 @@ export interface CivicReport {
   category: IssueCategory | string;
   location: ReportLocation;
   media: ReportMedia[];
-  status: ReportStatus;
-  severity?: 'Low' | 'Medium' | 'High';
+  status: ReportStatus | IncidentState | string;
+  incidentState?: IncidentState;
+  severity?: 'Low' | 'Medium' | 'High' | 'Critical';
+  confidence?: number;
   aiSummary?: string;
+  affectedServices?: string[];
+  assignedTeam?: AssignedTeamInfo | null;
+  rejectionReason?: string;
+  monitoringTimeline?: MonitoringUpdate[];
   createdAt: string;
   updatedAt: string;
 }

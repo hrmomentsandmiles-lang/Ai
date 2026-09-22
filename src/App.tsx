@@ -25,6 +25,10 @@ const AppContent: React.FC = () => {
       return <CitizenShell />;
     }
 
+    if (pathname.startsWith('/officer')) {
+      return <OfficerShell />;
+    }
+
     switch (pathname) {
       case '/about':
         return <AboutPage />;

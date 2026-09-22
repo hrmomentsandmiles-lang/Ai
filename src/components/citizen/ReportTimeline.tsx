@@ -4,13 +4,13 @@ import { ReportStatus } from '../../types/report';
 import { TIMELINE_STAGES } from '../../services/reportService';
 
 interface ReportTimelineProps {
-  currentStatus: ReportStatus;
+  currentStatus: ReportStatus | string;
 }
 
 export const ReportTimeline: React.FC<ReportTimelineProps> = ({
   currentStatus,
 }) => {
-  const currentIndex = TIMELINE_STAGES.indexOf(currentStatus);
+  const currentIndex = TIMELINE_STAGES.indexOf(currentStatus as ReportStatus);
 
   return (
     <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E4ECD8] shadow-xs">

@@ -9,11 +9,18 @@ export const Header: React.FC = () => {
   const { pathname, navigate } = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Authenticated Citizen Area Check
+  // Authenticated Area Checks
   const isCitizenArea = session?.role === 'citizen' && pathname.startsWith('/citizen');
+  const isOfficerArea = session?.role === 'officer' && pathname.startsWith('/officer');
 
-  // Navigation Links: Authenticated Citizen vs Public Website
-  const navLinks = isCitizenArea
+  // Navigation Links: Officer Area vs Citizen Area vs Public Website
+  const navLinks = isOfficerArea
+    ? [
+        { label: 'Dashboard', path: '/officer/dashboard' },
+        { label: 'Incidents', path: '/officer/dashboard' },
+        { label: 'Profile', path: '/officer/profile' },
+      ]
+    : isCitizenArea
     ? [
         { label: 'Home', path: '/' },
         { label: 'Report Issue', path: '/citizen/report' },
@@ -37,6 +44,9 @@ export const Header: React.FC = () => {
     if (path === '/citizen/dashboard') {
       return pathname === '/citizen/dashboard' || pathname === '/citizen';
     }
+    if (path === '/officer/dashboard') {
+      return pathname === '/officer/dashboard' || pathname === '/officer';
+    }
     return pathname === path;
   };
 
@@ -45,7 +55,7 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Left: Brand */}
         <CivicFlowLogo
-          onClick={() => handleNav('/')}
+          onClick={() => handleNav(isOfficerArea ? '/officer/dashboard' : isCitizenArea ? '/citizen/dashboard' : '/')}
           size="md"
           className="py-1"
         />
@@ -56,7 +66,7 @@ export const Header: React.FC = () => {
             const active = isCurrent(link.path);
             return (
               <button
-                key={link.path}
+                key={link.label + link.path}
                 id={`nav-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                 type="button"
                 onClick={() => handleNav(link.path)}
@@ -75,9 +85,39 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Far Right: Authenticated Citizen Controls OR Public Login CTA */}
+        {/* Far Right: Authenticated Officer / Citizen Controls OR Public Login CTA */}
         <div className="hidden md:flex items-center space-x-3">
-          {isCitizenArea ? (
+          {isOfficerArea ? (
+            /* 4. Authenticated Officer Header Right Side: Officer Name, Officer, Logout */
+            <div className="flex items-center gap-3 pl-3 border-l border-[#E2E8DA]">
+              <button
+                id="header-officer-profile-btn"
+                type="button"
+                onClick={() => handleNav('/officer/profile')}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#EBF2E2] text-[#36491E] border border-[#CFDEBE] hover:bg-[#E2ECD4] transition-colors"
+                title="Officer Profile"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#4D602B]" />
+                <span className="max-w-[130px] truncate">
+                  {session?.displayName || 'Municipal Officer'}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4D602B] bg-white/80 px-1.5 py-0.5 rounded border border-[#CFDEBE]/60">
+                  Officer
+                </span>
+              </button>
+
+              <button
+                id="header-signout-btn"
+                type="button"
+                onClick={logout}
+                title="Sign out"
+                className="p-1.5 text-[#73836D] hover:text-[#2A3723] hover:bg-[#EBF0E4] rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : isCitizenArea ? (
+            /* Authenticated Citizen Header Right Side */
             <div className="flex items-center gap-3 pl-3 border-l border-[#E2E8DA]">
               <button
                 id="header-citizen-profile-btn"
@@ -103,26 +143,23 @@ export const Header: React.FC = () => {
               </button>
             </div>
           ) : session ? (
+            /* User is logged in but browsing public pages */
             <div className="flex items-center gap-2 pl-3 border-l border-[#E2E8DA]">
               <button
                 id="header-user-portal-btn"
                 type="button"
                 onClick={() =>
-                  navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+                  navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer/dashboard')
                 }
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
-                  session.role === 'citizen'
-                    ? 'bg-[#EBF2E2] text-[#36491E] border-[#CFDEBE]'
-                    : 'bg-[#E4ECF4] text-[#1E3A5F] border-[#BED0E4]'
-                }`}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#EBF2E2] text-[#36491E] border border-[#CFDEBE] hover:bg-[#E2ECD4] transition-colors"
               >
                 {session.role === 'citizen' ? (
-                  <UserCheck className="w-3.5 h-3.5" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#4D602B]" />
                 ) : (
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#4D602B]" />
                 )}
                 <span>
-                  {session.role === 'citizen' ? 'Login' : 'Officer Portal'}
+                  {session.role === 'citizen' ? 'Citizen Portal' : 'Officer Portal'}
                 </span>
               </button>
 
@@ -130,13 +167,14 @@ export const Header: React.FC = () => {
                 id="header-signout-btn"
                 type="button"
                 onClick={logout}
-                title="Sign out mock session"
+                title="Sign out"
                 className="p-1.5 text-[#73836D] hover:text-[#2A3723] hover:bg-[#EBF0E4] rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
           ) : (
+            /* Public visitor */
             <button
               id="header-login-btn"
               type="button"
@@ -158,9 +196,9 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() =>
-                navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+                navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer/dashboard')
               }
-              className="text-xs px-2.5 py-1 rounded-lg bg-[#EBF2E2] text-[#36491E] font-medium"
+              className="text-xs px-2.5 py-1 rounded-lg bg-[#EBF2E2] text-[#36491E] font-semibold border border-[#D5E1CA]"
             >
               {session.role === 'citizen' ? 'Citizen' : 'Officer'}
             </button>
@@ -184,7 +222,7 @@ export const Header: React.FC = () => {
             const active = isCurrent(link.path);
             return (
               <button
-                key={link.path}
+                key={link.label + link.path}
                 type="button"
                 onClick={() => handleNav(link.path)}
                 className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -204,18 +242,20 @@ export const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    handleNav(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+                    handleNav(session.role === 'citizen' ? '/citizen/dashboard' : '/officer/dashboard')
                   }
                   className="text-xs font-semibold text-[#36491E]"
                 >
-                  {isCitizenArea
-                    ? `Signed in as ${session.displayName || 'Citizen'}`
-                    : `Go to ${session.role === 'citizen' ? 'Login' : 'Officer Operations'}`}
+                  {isOfficerArea
+                    ? `Officer: ${session.displayName || 'Officer'}`
+                    : isCitizenArea
+                    ? `Citizen: ${session.displayName || 'Citizen'}`
+                    : `Go to ${session.role === 'citizen' ? 'Citizen Portal' : 'Officer Portal'}`}
                 </button>
                 <button
                   type="button"
                   onClick={logout}
-                  className="text-xs font-medium text-rose-700 hover:underline"
+                  className="text-xs font-semibold text-[#574823] hover:underline"
                 >
                   Sign Out
                 </button>

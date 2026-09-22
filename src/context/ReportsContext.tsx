@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { CivicReport } from '../types/report';
+import { CivicReport, ResponseTeamId } from '../types/report';
 import {
   getStoredReports,
   createNewReport as createReportInStorage,
   getReportById as findReportById,
+  approveIncidentInStorage,
+  rejectIncidentInStorage,
+  assignTeamInStorage,
+  advanceMonitoringInStorage,
 } from '../services/reportService';
 
 interface ReportsContextType {
@@ -13,6 +17,14 @@ interface ReportsContextType {
   addReport: (
     data: Omit<CivicReport, 'id' | 'createdAt' | 'updatedAt' | 'status'>
   ) => CivicReport;
+  approveIncident: (id: string) => CivicReport | undefined;
+  rejectIncident: (id: string, reason: string) => CivicReport | undefined;
+  assignTeam: (
+    id: string,
+    teamId: ResponseTeamId | string,
+    teamName: string
+  ) => CivicReport | undefined;
+  advanceMonitoring: (id: string) => CivicReport | undefined;
 }
 
 const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
@@ -45,6 +57,46 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
     [refreshReports]
   );
 
+  const approveIncident = useCallback(
+    (id: string): CivicReport | undefined => {
+      const updated = approveIncidentInStorage(id);
+      refreshReports();
+      return updated;
+    },
+    [refreshReports]
+  );
+
+  const rejectIncident = useCallback(
+    (id: string, reason: string): CivicReport | undefined => {
+      const updated = rejectIncidentInStorage(id, reason);
+      refreshReports();
+      return updated;
+    },
+    [refreshReports]
+  );
+
+  const assignTeam = useCallback(
+    (
+      id: string,
+      teamId: ResponseTeamId | string,
+      teamName: string
+    ): CivicReport | undefined => {
+      const updated = assignTeamInStorage(id, teamId, teamName);
+      refreshReports();
+      return updated;
+    },
+    [refreshReports]
+  );
+
+  const advanceMonitoring = useCallback(
+    (id: string): CivicReport | undefined => {
+      const updated = advanceMonitoringInStorage(id);
+      refreshReports();
+      return updated;
+    },
+    [refreshReports]
+  );
+
   return (
     <ReportsContext.Provider
       value={{
@@ -52,6 +104,10 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshReports,
         getReport,
         addReport,
+        approveIncident,
+        rejectIncident,
+        assignTeam,
+        advanceMonitoring,
       }}
     >
       {children}
