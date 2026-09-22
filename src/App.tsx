@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { RouterProvider, useRouter } from './context/RouterContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { HomePage } from './components/public/HomePage';
@@ -13,51 +13,18 @@ import { AboutPage } from './components/public/AboutPage';
 import { SupportPage } from './components/public/SupportPage';
 import { ContactPage } from './components/public/ContactPage';
 import { LoginPage } from './components/public/LoginPage';
-import { CitizenDashboard } from './components/citizen/CitizenDashboard';
-import { ReportIssuePage } from './components/citizen/ReportIssuePage';
-import { MyReportsPage } from './components/citizen/MyReportsPage';
-import { ReportDetailsPage } from './components/citizen/ReportDetailsPage';
-import { CitizenProfilePage } from './components/citizen/CitizenProfilePage';
+import { CitizenShell } from './components/citizen/CitizenShell';
 import { OfficerShell } from './components/officer/OfficerShell';
 
 const AppContent: React.FC = () => {
   const { pathname } = useRouter();
-  const { session } = useAuth();
 
   // Route matching with public pages and authenticated shells
   const renderRoute = () => {
-    // Protected Citizen Routes Check
     if (pathname.startsWith('/citizen')) {
-      if (!session) {
-        return <LoginPage />;
-      }
-
-      if (pathname === '/citizen/report') {
-        return <ReportIssuePage />;
-      }
-      if (pathname === '/citizen/reports') {
-        return <MyReportsPage />;
-      }
-      if (pathname.startsWith('/citizen/reports/')) {
-        const reportId = pathname.replace('/citizen/reports/', '').split('/')[0];
-        return <ReportDetailsPage reportId={reportId} />;
-      }
-      if (pathname === '/citizen/profile') {
-        return <CitizenProfilePage />;
-      }
-      // Default citizen path: /citizen or /citizen/dashboard
-      return <CitizenDashboard />;
+      return <CitizenShell />;
     }
 
-    // Protected Officer Route
-    if (pathname.startsWith('/officer')) {
-      if (!session) {
-        return <LoginPage />;
-      }
-      return <OfficerShell />;
-    }
-
-    // Public Routes
     switch (pathname) {
       case '/about':
         return <AboutPage />;
@@ -67,6 +34,8 @@ const AppContent: React.FC = () => {
         return <ContactPage />;
       case '/login':
         return <LoginPage />;
+      case '/officer':
+        return <OfficerShell />;
       case '/':
       default:
         return <HomePage />;

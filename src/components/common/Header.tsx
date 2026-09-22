@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, ShieldCheck, UserCheck, LogOut } from 'lucide-react';
+import { Menu, X, ShieldCheck, UserCheck, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from '../../context/RouterContext';
 import { CivicFlowLogo } from './CivicFlowLogo';
@@ -9,12 +9,23 @@ export const Header: React.FC = () => {
   const { pathname, navigate } = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'About', path: '/about' },
-    { label: 'Support', path: '/support' },
-    { label: 'Contact', path: '/contact' },
-  ];
+  // Authenticated Citizen Area Check
+  const isCitizenArea = session?.role === 'citizen' && pathname.startsWith('/citizen');
+
+  // Navigation Links: Authenticated Citizen vs Public Website
+  const navLinks = isCitizenArea
+    ? [
+        { label: 'Home', path: '/' },
+        { label: 'Report Issue', path: '/citizen/report' },
+        { label: 'Dashboard', path: '/citizen/dashboard' },
+        { label: 'Profile', path: '/citizen/profile' },
+      ]
+    : [
+        { label: 'Home', path: '/' },
+        { label: 'About', path: '/about' },
+        { label: 'Support', path: '/support' },
+        { label: 'Contact', path: '/contact' },
+      ];
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -23,6 +34,9 @@ export const Header: React.FC = () => {
 
   const isCurrent = (path: string) => {
     if (path === '/') return pathname === '/' || pathname === '';
+    if (path === '/citizen/dashboard') {
+      return pathname === '/citizen/dashboard' || pathname === '/citizen';
+    }
     return pathname === path;
   };
 
@@ -43,7 +57,7 @@ export const Header: React.FC = () => {
             return (
               <button
                 key={link.path}
-                id={`nav-link-${link.label.toLowerCase()}`}
+                id={`nav-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                 type="button"
                 onClick={() => handleNav(link.path)}
                 className={`relative py-1 text-sm font-medium tracking-wide transition-colors ${
@@ -61,14 +75,41 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Far Right: Login CTA or Active Session */}
+        {/* Far Right: Authenticated Citizen Controls OR Public Login CTA */}
         <div className="hidden md:flex items-center space-x-3">
-          {session ? (
+          {isCitizenArea ? (
+            <div className="flex items-center gap-3 pl-3 border-l border-[#E2E8DA]">
+              <button
+                id="header-citizen-profile-btn"
+                type="button"
+                onClick={() => handleNav('/citizen/profile')}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#EBF2E2] text-[#36491E] border border-[#CFDEBE] hover:bg-[#E2ECD4] transition-colors"
+                title="Citizen Profile"
+              >
+                <User className="w-3.5 h-3.5 text-[#4D602B]" />
+                <span className="max-w-[140px] truncate">
+                  {session?.displayName || 'Aarav Sharma'}
+                </span>
+              </button>
+
+              <button
+                id="header-signout-btn"
+                type="button"
+                onClick={logout}
+                title="Sign out"
+                className="p-1.5 text-[#73836D] hover:text-[#2A3723] hover:bg-[#EBF0E4] rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : session ? (
             <div className="flex items-center gap-2 pl-3 border-l border-[#E2E8DA]">
               <button
                 id="header-user-portal-btn"
                 type="button"
-                onClick={() => navigate(session.role === 'citizen' ? '/citizen' : '/officer')}
+                onClick={() =>
+                  navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+                }
                 className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
                   session.role === 'citizen'
                     ? 'bg-[#EBF2E2] text-[#36491E] border-[#CFDEBE]'
@@ -116,7 +157,9 @@ export const Header: React.FC = () => {
           {session && (
             <button
               type="button"
-              onClick={() => navigate(session.role === 'citizen' ? '/citizen' : '/officer')}
+              onClick={() =>
+                navigate(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+              }
               className="text-xs px-2.5 py-1 rounded-lg bg-[#EBF2E2] text-[#36491E] font-medium"
             >
               {session.role === 'citizen' ? 'Citizen' : 'Officer'}
@@ -160,10 +203,14 @@ export const Header: React.FC = () => {
               <div className="flex items-center justify-between pt-1">
                 <button
                   type="button"
-                  onClick={() => handleNav(session.role === 'citizen' ? '/citizen' : '/officer')}
+                  onClick={() =>
+                    handleNav(session.role === 'citizen' ? '/citizen/dashboard' : '/officer')
+                  }
                   className="text-xs font-semibold text-[#36491E]"
                 >
-                  Go to {session.role === 'citizen' ? 'Login' : 'Officer Operations'}
+                  {isCitizenArea
+                    ? `Signed in as ${session.displayName || 'Citizen'}`
+                    : `Go to ${session.role === 'citizen' ? 'Login' : 'Officer Operations'}`}
                 </button>
                 <button
                   type="button"

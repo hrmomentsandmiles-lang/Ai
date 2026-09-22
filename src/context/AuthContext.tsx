@@ -106,10 +106,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
 
     // Route user according to role as requested:
-    // Citizen -> /citizen
+    // Citizen -> /citizen/dashboard
     // Officer -> /officer
     if (role === 'citizen') {
-      navigate('/citizen');
+      navigate('/citizen/dashboard');
     } else {
       navigate('/officer');
     }
