@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Calendar, Film } from 'lucide-react';
 import { useReports } from '../../context/ReportsContext';
 import { useRouter } from '../../context/RouterContext';
 import { StatusBadge } from './StatusBadge';
 import { ReportTimeline } from './ReportTimeline';
+import { getIncident } from '../../services/incidentApi';
 
 interface ReportDetailsProps {
   reportId: string;
 }
 
 export const ReportDetails: React.FC<ReportDetailsProps> = ({ reportId }) => {
-  const { getReport } = useReports();
   const { navigate } = useRouter();
+  const [report, setReport] = useState<ReturnType<typeof getIncident> extends Promise<infer T> ? T | null : null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const report = getReport(reportId);
+  useEffect(() => {
+    let active = true;
+    setReport(null);
+    setLoadError(null);
+    void getIncident(reportId)
+      .then((incident) => {
+        if (active) setReport(incident);
+      })
+      .catch((error: unknown) => {
+        if (active) setLoadError(error instanceof Error ? error.message : 'Unable to load this report.');
+      });
+    return () => {
+      active = false;
+    };
+  }, [reportId]);
+
+  if (!report && !loadError) {
+    return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-sm text-[#63745C]">Loading report...</div>;
+  }
 
   if (!report) {
     return (
@@ -21,7 +41,7 @@ export const ReportDetails: React.FC<ReportDetailsProps> = ({ reportId }) => {
         <div className="bg-white rounded-3xl p-10 border border-[#E4ECD8]">
           <h2 className="text-xl font-bold text-[#182315]">Report Not Found</h2>
           <p className="text-xs text-[#63745C] mt-2">
-            We couldn't locate any record matching ID: <strong>{reportId}</strong>
+            {loadError || `We couldn't locate any record matching ID: ${reportId}`}
           </p>
           <button
             type="button"

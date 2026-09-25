@@ -3,6 +3,8 @@ export type UserRole = 'citizen' | 'officer';
 export type AuthStep = 'input' | 'otp';
 
 export interface UserSession {
+  userId: string;
+  sessionToken: string;
   phone: string;
   role: UserRole;
   authenticatedAt: string;

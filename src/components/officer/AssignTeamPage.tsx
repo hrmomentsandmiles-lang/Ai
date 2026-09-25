@@ -88,12 +88,12 @@ export const AssignTeamPage: React.FC<AssignTeamPageProps> = ({ incidentId }) =>
     );
   }
 
-  const handleConfirmAssignment = () => {
+  const handleConfirmAssignment = async () => {
     if (!selectedTeamId) return;
     const team = TEAMS.find((t) => t.id === selectedTeamId);
     if (!team) return;
 
-    assignTeam(incident.id, team.id, team.name);
+    await assignTeam(incident.id, team.id, team.name);
     setAssignedTeamName(team.name);
     setAssignmentConfirmed(true);
   };

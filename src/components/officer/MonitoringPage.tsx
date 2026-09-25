@@ -98,8 +98,8 @@ export const MonitoringPage: React.FC<MonitoringPageProps> = ({ incidentId }) =>
         },
       ];
 
-  const handleSimulateNext = () => {
-    advanceMonitoring(incident.id);
+  const handleSimulateNext = async () => {
+    await advanceMonitoring(incident.id);
   };
 
   // Team coordinates for simulation map based on stage

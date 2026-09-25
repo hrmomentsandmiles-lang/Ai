@@ -2,7 +2,23 @@ node_modules/
 build/
 dist/
 coverage/
+
 .DS_Store
 *.log
+
 .env*
 !.env.example
+
+# Local SQLite database
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Generated Prisma client
+/generated/prisma
+
+# Local AI/editor tooling
+.agents/
+.claude/
+.windsurf/

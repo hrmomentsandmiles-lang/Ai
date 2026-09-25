@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  phone       String   @unique
+  role        String
+  displayName String
+  badgeId     String?
+  department  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  incidents     Incident[]     @relation("CitizenIncidents")
+  approvedPlans ResponsePlan[] @relation("PlanApprover")
+  auditEvents   AuditEvent[]
+
+  @@index([role])
+}
+
+model Incident {
+  id          String @id
+  citizenId   String
+  title       String
+  description String
+  category    String
+  address     String
+  latitude    Float?
+  longitude   Float?
+
+  status        String
+  incidentState String
+
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  citizen User @relation("CitizenIncidents", fields: [citizenId], references: [id])
+
+  evidence         IncidentEvidence[]
+  analysis         IncidentAnalysis?
+  impacts          IncidentImpact[]
+  responsePlans    ResponsePlan[]
+  assignments      ResponseAssignment[]
+  monitoringEvents MonitoringEvent[]
+  auditEvents      AuditEvent[]
+
+  @@index([citizenId])
+  @@index([category])
+  @@index([status])
+  @@index([incidentState])
+  @@index([createdAt])
+}
+
+model IncidentEvidence {
+  id         String   @id @default(cuid())
+  incidentId String
+  name       String
+  url        String
+  type       String
+  size       String?
+  createdAt  DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+}
+
+model IncidentAnalysis {
+  id         String   @id @default(cuid())
+  incidentId String   @unique
+  severity   String?
+  confidence Float?
+  aiSummary  String?
+  analyzedAt DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+}
+
+model IncidentImpact {
+  id         String   @id @default(cuid())
+  incidentId String
+  serviceId  String
+  reason     String?
+  severity   String?
+  createdAt  DateTime @default(now())
+
+  incident Incident     @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  service  ResponseTeam @relation(fields: [serviceId], references: [id])
+
+  @@unique([incidentId, serviceId])
+  @@index([serviceId])
+}
+
+model ResponseTeam {
+  id           String   @id
+  name         String
+  description  String
+  availability String   @default("Available")
+  leadOfficer  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  impacts     IncidentImpact[]
+  assignments ResponseAssignment[]
+  actions     ResponseAction[]
+}
+
+model ResponsePlan {
+  id           String    @id @default(cuid())
+  incidentId   String
+  version      Int       @default(1)
+  status       String
+  createdAt    DateTime  @default(now())
+  approvedAt   DateTime?
+  approvedById String?
+
+  incident   Incident         @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  approvedBy User?            @relation("PlanApprover", fields: [approvedById], references: [id])
+  actions    ResponseAction[]
+
+  @@index([incidentId])
+  @@index([status])
+}
+
+model ResponseAssignment {
+  id           String   @id @default(cuid())
+  incidentId   String
+  teamId       String
+  assignedAt   DateTime @default(now())
+  availability String?
+  leadOfficer  String?
+  active       Boolean  @default(true)
+
+  incident Incident     @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  team     ResponseTeam @relation(fields: [teamId], references: [id])
+
+  @@index([incidentId])
+  @@index([teamId])
+  @@index([active])
+}
+
+model ResponseAction {
+  id          String    @id @default(cuid())
+  planId      String
+  serviceId   String?
+  type        String
+  description String
+  status      String    @default("PENDING")
+  resourceId  String?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  plan    ResponsePlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  service ResponseTeam? @relation(fields: [serviceId], references: [id])
+
+  @@index([planId])
+  @@index([serviceId])
+  @@index([status])
+}
+
+model MonitoringEvent {
+  id         String   @id @default(cuid())
+  incidentId String
+  stage      String
+  label      String
+  timestamp  DateTime @default(now())
+  note       String?
+  completed  Boolean  @default(false)
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+  @@index([stage])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  incidentId String?
+  actorId    String?
+  action     String
+  details    String?
+  timestamp  DateTime @default(now())
+
+  incident Incident? @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  actor    User?     @relation(fields: [actorId], references: [id])
+
+  @@index([incidentId])
+  @@index([actorId])
+  @@index([timestamp])
+}

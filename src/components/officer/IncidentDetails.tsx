@@ -62,16 +62,16 @@ export const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incidentId }) 
     incident.incidentState === 'WORK_STARTED' ||
     incident.incidentState === 'COMPLETED';
 
-  const handleApprove = () => {
-    approveIncident(incident.id);
+  const handleApprove = async () => {
+    await approveIncident(incident.id);
     setActionSuccessMessage('Incident approved. Ready for response team assignment.');
     setTimeout(() => setActionSuccessMessage(null), 4000);
   };
 
-  const handleRejectConfirm = (e: React.FormEvent) => {
+  const handleRejectConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rejectReason.trim()) return;
-    rejectIncident(incident.id, rejectReason.trim());
+    await rejectIncident(incident.id, rejectReason.trim());
     setRejectModalOpen(false);
     setActionSuccessMessage('Incident rejected.');
     setTimeout(() => setActionSuccessMessage(null), 4000);

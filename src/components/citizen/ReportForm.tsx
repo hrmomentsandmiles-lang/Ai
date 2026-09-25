@@ -161,7 +161,7 @@ export const ReportForm: React.FC = () => {
   };
 
   // Form Submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
@@ -183,8 +183,14 @@ export const ReportForm: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const newReport = addReport({
-        citizenId: session?.phone || 'CIT-8821',
+      if (!session?.userId) {
+        setFormError('Your session is not connected to a database user. Please log in again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const newReport = await addReport({
+        citizenId: session.userId,
         title: title.trim(),
         description: description.trim(),
         category,
