@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
   // Authenticated Area Checks
   const isCitizenArea = session?.role === 'citizen' && pathname.startsWith('/citizen');
   const isOfficerArea = session?.role === 'officer' && pathname.startsWith('/officer');
+  const isHomePage = pathname === '/' || pathname === '';
 
   // Navigation Links: Officer Area vs Citizen Area vs Public Website
   const navLinks = isOfficerArea
@@ -51,7 +52,13 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E7ECE0] transition-colors">
+    <header
+      className={`sticky top-0 z-40 transition-all ${
+        isHomePage
+          ? 'bg-transparent border-b border-transparent'
+          : 'bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E7ECE0]'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Left: Brand */}
         <CivicFlowLogo
@@ -61,7 +68,7 @@ export const Header: React.FC = () => {
         />
 
         {/* Center/Right Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-7 lg:space-x-8">
           {navLinks.map((link) => {
             const active = isCurrent(link.path);
             return (
@@ -73,7 +80,7 @@ export const Header: React.FC = () => {
                 className={`relative py-1 text-sm font-medium tracking-wide transition-colors ${
                   active
                     ? 'text-[#182315] font-semibold'
-                    : 'text-[#5A6754] hover:text-[#182315]'
+                    : 'text-[#485642] hover:text-[#182315]'
                 }`}
               >
                 {link.label}
@@ -85,8 +92,8 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Far Right: Authenticated Officer / Citizen Controls OR Public Login CTA */}
-        <div className="hidden md:flex items-center space-x-3">
+        {/* Far Right: Authenticated Officer / Citizen Controls OR Public Login CTA + Slogan */}
+        <div className="hidden md:flex items-center space-x-4">
           {isOfficerArea ? (
             /* 4. Authenticated Officer Header Right Side: Officer Name, Officer, Logout */
             <div className="flex items-center gap-3 pl-3 border-l border-[#E2E8DA]">
@@ -179,7 +186,7 @@ export const Header: React.FC = () => {
               id="header-login-btn"
               type="button"
               onClick={() => handleNav('/login')}
-              className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+              className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
                 pathname === '/login'
                   ? 'bg-[#3A491F] text-white ring-2 ring-[#4D602B]/40'
                   : 'bg-[#435322] hover:bg-[#36441B] text-white'
@@ -187,6 +194,18 @@ export const Header: React.FC = () => {
             >
               Login
             </button>
+          )}
+
+          {/* Top-Right Hero Slogan: CLEANER CITIES / SAFER COMMUNITIES / BRIGHTER TOMORROW */}
+          {isHomePage && (
+            <div className="hidden lg:flex flex-col items-end text-right pl-4 select-none">
+              <div className="text-[10px] xl:text-[10.5px] font-bold tracking-[0.16em] text-[#182315] uppercase leading-[1.2]">
+                <div>CLEANER CITIES</div>
+                <div>SAFER COMMUNITIES</div>
+                <div>BRIGHTER TOMORROW</div>
+              </div>
+              <div className="w-10 h-[2px] bg-[#4D602B] mt-1.5 rounded-full" />
+            </div>
           )}
         </div>
 
